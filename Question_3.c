@@ -12,6 +12,7 @@ void logFinish(char* tID);//function to log that a thread has finished its time
 void startClock();//function to start program clock
 long getCurrentTime();//function to check current time since clock was started
 time_t programClock;//the global timer/clock for the program
+int SortComp(const void *x, const void *y);
 
 typedef struct thread //represents a single thread
 {
@@ -33,27 +34,38 @@ int main(int argc, char *argv[])
 	}
 
     //you can add some suitable code here as per problem sepcification
-
-    printf("check1\n");
-
     Thread t[4];
     Thread **ptr = &t;
 
     int threadCount = readFile(argv[1], ptr);
+	qsort(*ptr, threadCount, sizeof(Thread), SortComp);
     startClock();
     
     int i = 0;
+	int j = 0;
+
+	//thread after sorting
+	Thread **ptr2 = ptr;
+	//create array of threads
+	pthread_t threadT[threadCount];
+
 	while(i < threadCount)//put a suitable condition here to run your program
 	{
-        pthread_t threadT;
-        logStart( ((*ptr) + i)->tid);
-        pthread_create( &threadT, NULL, threadRun, (void*) ( (*ptr) + i ));
-        pthread_join(threadT, NULL);
+        int timer = getCurrentTime();
+		if(timer == ( (*ptr2) + i)-> startTime){
+			logStart( ((*ptr2) + i)->tid);
+        	pthread_create( &threadT[i], NULL, threadRun, (void*) ( (*ptr2) + i ));	
+			i++;
+		}
         
-        i++;
-
-
 	}
+
+	while(j < threadCount)//put a suitable condition here to run your program
+	{
+        pthread_join(threadT[j], NULL);
+        j++;
+	}
+
 	return 0;
 }
 
@@ -162,4 +174,19 @@ long getCurrentTime()//invoke this method whenever you want to check how much ti
 	time_t now;
 	now = time(NULL);
 	return now-programClock;
+}
+
+int SortComp(const void *x, const void *y) {
+
+    const Thread *tX = x;
+    const Thread *tY = y;
+
+    if (tX->startTime == tY->startTime)
+        return 0;
+
+    else if (tX->startTime > tY->startTime)
+        return 1;
+
+    else
+        return -1;
 }
