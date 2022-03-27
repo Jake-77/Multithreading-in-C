@@ -19,7 +19,7 @@ typedef struct thread //represents a single thread
 //add more members here as per requirement
     int startTime;
     int endTime;
-} Thread; //Im changing this line 
+} Thread; //Im changing this line making a change again
 
 void* threadRun(void* t);//the thread function, the code executed by each thread
 int readFile(char* fileName, Thread** threads);//function to read the file content and build array of threads
